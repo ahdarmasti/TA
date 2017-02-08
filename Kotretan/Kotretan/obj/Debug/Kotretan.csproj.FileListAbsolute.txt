@@ -1,0 +1,15 @@
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\Kotretan.exe.config
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\Kotretan.exe
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\Kotretan.pdb
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\GMap.NET.Core.dll
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\GMap.NET.WindowsForms.dll
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\GMap.NET.Core.xml
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\GMap.NET.WindowsForms.xml
+D:\VisualStudioProjects\Kotretan\Kotretan\obj\Debug\Kotretan.csprojResolveAssemblyReference.cache
+D:\VisualStudioProjects\Kotretan\Kotretan\obj\Debug\Kotretan.Form1.resources
+D:\VisualStudioProjects\Kotretan\Kotretan\obj\Debug\Kotretan.Properties.Resources.resources
+D:\VisualStudioProjects\Kotretan\Kotretan\obj\Debug\Kotretan.csproj.GenerateResource.Cache
+D:\VisualStudioProjects\Kotretan\Kotretan\obj\Debug\Kotretan.exe
+D:\VisualStudioProjects\Kotretan\Kotretan\obj\Debug\Kotretan.pdb
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\M2Mqtt.Net.dll
+D:\VisualStudioProjects\Kotretan\Kotretan\bin\Debug\M2Mqtt.Net.pdb
