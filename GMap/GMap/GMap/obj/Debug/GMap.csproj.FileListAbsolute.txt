@@ -1,0 +1,44 @@
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\GMap.exe.config
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\GMap.exe
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\GMap.pdb
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\GMap.NET.Core.dll
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\GMap.NET.WindowsForms.dll
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\GMap.NET.Core.xml
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\GMap.NET.WindowsForms.xml
+D:\VisualStudioProjects\GMap\GMap\GMap\obj\Debug\GMap.Form1.resources
+D:\VisualStudioProjects\GMap\GMap\GMap\obj\Debug\GMap.Properties.Resources.resources
+D:\VisualStudioProjects\GMap\GMap\GMap\obj\Debug\GMap.csproj.GenerateResource.Cache
+D:\VisualStudioProjects\GMap\GMap\GMap\obj\Debug\GMap.exe
+D:\VisualStudioProjects\GMap\GMap\GMap\obj\Debug\GMap.pdb
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\M2Mqtt.Net.dll
+D:\VisualStudioProjects\GMap\GMap\GMap\bin\Debug\M2Mqtt.Net.pdb
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\GMap.exe.config
+C:\Users\O\Desktop\GMap\GMap\GMap\obj\Debug\GMap.exe
+C:\Users\O\Desktop\GMap\GMap\GMap\obj\Debug\GMap.pdb
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\GMap.exe
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\GMap.pdb
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\GMap.NET.Core.dll
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\GMap.NET.WindowsForms.dll
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\M2Mqtt.Net.dll
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\GMap.NET.Core.xml
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\GMap.NET.WindowsForms.xml
+C:\Users\O\Desktop\GMap\GMap\GMap\bin\Debug\M2Mqtt.Net.pdb
+C:\Users\O\Desktop\GMap\GMap\GMap\obj\Debug\GMap.csprojResolveAssemblyReference.cache
+C:\Users\O\Desktop\GMap\GMap\GMap\obj\Debug\GMap.Form1.resources
+C:\Users\O\Desktop\GMap\GMap\GMap\obj\Debug\GMap.Properties.Resources.resources
+C:\Users\O\Desktop\GMap\GMap\GMap\obj\Debug\GMap.csproj.GenerateResource.Cache
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\GMap.exe.config
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\obj\Debug\GMap.exe
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\obj\Debug\GMap.pdb
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\GMap.exe
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\GMap.pdb
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\GMap.NET.Core.dll
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\GMap.NET.WindowsForms.dll
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\M2Mqtt.Net.dll
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\GMap.NET.Core.xml
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\GMap.NET.WindowsForms.xml
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\bin\Debug\M2Mqtt.Net.pdb
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\obj\Debug\GMap.Form1.resources
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\obj\Debug\GMap.Properties.Resources.resources
+E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\obj\Debug\GMap.csproj.GenerateResource.Cache
+D:\VisualStudioProjects\GMap\GMap\GMap\obj\Debug\GMap.csprojResolveAssemblyReference.cache
