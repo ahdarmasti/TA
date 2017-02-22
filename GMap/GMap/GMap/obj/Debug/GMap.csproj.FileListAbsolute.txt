@@ -42,3 +42,18 @@ E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\obj\Debug\GMap.Form1.resources
 E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\obj\Debug\GMap.Properties.Resources.resources
 E:\tubes dehan keosisasi oi\backup\GMap\GMap\GMap\obj\Debug\GMap.csproj.GenerateResource.Cache
 D:\VisualStudioProjects\GMap\GMap\GMap\obj\Debug\GMap.csprojResolveAssemblyReference.cache
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\GMap.exe.config
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\GMap.exe
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\GMap.pdb
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\GMap.NET.Core.dll
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\GMap.NET.WindowsForms.dll
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\M2Mqtt.Net.dll
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\GMap.NET.Core.xml
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\GMap.NET.WindowsForms.xml
+E:\kuliah\TA\code\GMap\GMap\GMap\bin\Debug\M2Mqtt.Net.pdb
+E:\kuliah\TA\code\GMap\GMap\GMap\obj\Debug\GMap.csprojResolveAssemblyReference.cache
+E:\kuliah\TA\code\GMap\GMap\GMap\obj\Debug\GMap.Form1.resources
+E:\kuliah\TA\code\GMap\GMap\GMap\obj\Debug\GMap.Properties.Resources.resources
+E:\kuliah\TA\code\GMap\GMap\GMap\obj\Debug\GMap.csproj.GenerateResource.Cache
+E:\kuliah\TA\code\GMap\GMap\GMap\obj\Debug\GMap.exe
+E:\kuliah\TA\code\GMap\GMap\GMap\obj\Debug\GMap.pdb

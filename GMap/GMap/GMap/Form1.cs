@@ -10,6 +10,7 @@ using System.Windows.Forms;
 using System.Globalization;
 using System.Net;
 
+
 using GMap.NET;
 using GMap.NET.WindowsForms;
 using GMap.NET.WindowsForms.Markers;
@@ -23,7 +24,7 @@ namespace GMap
     public partial class Form1 : Form
     {
         string clientId = Guid.NewGuid().ToString(); //Client ID
-        MqttClient clientSub = new MqttClient("192.168.1.3"); // Buat subscribe 
+        MqttClient clientSub = new MqttClient("iot.eclipse.org"); // Buat subscribe 
 
         public double[] lat = new double[10];
         public double[] lon = new double[10];
@@ -32,7 +33,7 @@ namespace GMap
 
         GMapMarker currentMarker;
 
-        //Algoritma penjadwalan
+        //-------------------Algoritma penjadwalan-------------------
         Timer T1, T2, T3, T4, T5, T6, T7, T8, T9, T10;
         Timer utama;
 
@@ -41,8 +42,23 @@ namespace GMap
         public double[] speedcomm = new double[10];
 
         public int[] arrayke = new int[10] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        double[,] coord = new double[6199, 2]
+        double[] kecepatanfleet = new double[10] { 54, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        Boolean[] berhentihalte = new Boolean[10] { false, false, false, false, false, false, false, false, false, false };
+        int[] posisihalte = new int[10] { 40, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
+        int[] durasiberhentifleet = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
+        //inputan
+        double kecepatan_lambat2 = 21.6; //km/jam
+        double kecepatan_lambat1 = 43.2; //km/jam
+        double kecepatan_normal = 54; //km/jam
+        double kecepatan_kenceng1 = 64.8; //km/jam
+        double kecepatan_kenceng2 = 86.4; //km/jam
+        int perbedaan_segment = 33; // 33*3 = 99 m
+        int durasi_berhenti = 10; //30 detik lama waktu berhenti di halte
+
+        //-------------------Algoritma penjadwalan-------------------
+
+        double[,] coord = new double[6199, 2]
         #region Arraykoordinat
         {
 {-6.9174199999999999, 107.57443000000001},
@@ -6455,7 +6471,7 @@ namespace GMap
             int i = 0;
             for (i = 0; i < 10; i++)
             {
-                arrayke[i] = sorting(lat[i], lon[i]);
+                //arrayke[i] = sorting(lat[i], lon[i]);
                 if (i == 0) { displayfleet1(coord[arrayke[i], 0], coord[arrayke[i], 1]); }
                 else if (i == 1) { displayfleet2(coord[arrayke[i], 0], coord[arrayke[i], 1]); }
                 else if (i == 2) { displayfleet3(coord[arrayke[i], 0], coord[arrayke[i], 1]); }
@@ -6467,8 +6483,10 @@ namespace GMap
                 else if (i == 8) { displayfleet9(coord[arrayke[i], 0], coord[arrayke[i], 1]); }
                 else if (i == 9) { displayfleet10(coord[arrayke[i], 0], coord[arrayke[i], 1]); }
             }
+            fleet1();
             penjadwalan();
             cekjadwal();
+           
         }
 
         #region Fleetcommand
@@ -6778,56 +6796,129 @@ namespace GMap
             }
         }
 
+        //-------------------Algoritma penjadwalan-------------------
+
+        //merubah kecepatan --> jarak/detik --> counter tiap detiknya
+        int kecepatanToCounter(double kecepatan)
+        {
+            return (Convert.ToInt32((kecepatan*1000/3600)/3));//ngeround otomatis pake convert.tointeger
+        }
+
+        //prosedur yang menjalankan fleet 1 jalan secepat kecepatan nya
+        void fleet1()
+        {
+            arrayke[0] += kecepatanToCounter(kecepatanfleet[0]);
+        }
 
         void penjadwalan()
         {
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i <= 0; i++)
             {
-                counterfleetsch[i] = counterfleetsch[i]+ 4;
+
+                if (posisihalte.Contains(counterfleetsch[i])) //cek didalam array posisihalte mengandung counterfleetsch[i]
+                {
+                    berhentihalte[i] = true; //counterfleetsch[i] == salah satu array posisihalte --> indikator berhentihalte[i] jadi true
+                    label14.Text = "Status : berhenti di halte"; //update tulisan
+                }
+
+                if (berhentihalte[i] == false) //kalo lagi ga berhenti halte, countefleetsch[i] di tambah
+                {
+                    counterfleetsch[i] = counterfleetsch[i] + 5; //kecepatan fleet 54km/jam
+                }
+                else //kalo berhenti dihalte
+                {
+                    durasiberhentifleet[i]++; //counter lama waktu fleet berhenti di halte dalam detik, tiap detik nambah
+                    label14.Text = "Status : berhenti di halte " + durasiberhentifleet[i];//update tulisan
+                    if (durasiberhentifleet[i] == durasi_berhenti) //kalo udah 30 detik berhenti
+                    {
+                        berhentihalte[i] = false; //kalo udah 30 detik ubah array indikator berhenti dihalte jd false 
+                        durasiberhentifleet[i] = 0; //durasi jadi 0 lagi
+                        counterfleetsch[i] = counterfleetsch[i] + 5; //counterfleetsch nambah sesuai kecepatan fleet 54km/jam
+                    }
+                }
+                label21.Text = "posisi sch :" + counterfleetsch[i];//update tulisan
             }
         }
 
         void cekjadwal()
         {
-           label14.Text = "Status : Masuk cekjadwal";
-
-            for (int i = 0; i < 10; i++)
+            //todo : kasih toleransi jangan saklek di 1 posisi array ---> update perhitungan ETA
+            
+            //label14.Text = "Status : Masuk cekjadwal";
+            for (int i = 0; i <= 0; i++)
             {
-                counterfleet[i] = arrayke[i];
-                if (counterfleetsch[i] != counterfleet[i])
+                counterfleet[i] = arrayke[i]; //sebenernya ga perlu, tapi sekarang gini dl aja, ntar ntar lsg akses variable arrayke aja
+                label20.Text = "Posisi :" + counterfleet[i]; //update posisi
+
+                if (berhentihalte[i] == false) //kalo ga berhenti dihalte
                 {
-                    if (counterfleetsch[i] > counterfleet[i])
+                    if (counterfleetsch[i] != counterfleet[i]) //kalo ga pas sesuai sch
                     {
-                        label14.Text = "Status : Fleet 1 KELAMBATAN";
-                        int perbedaan = counterfleetsch[i] - counterfleet[i];
+                        if (counterfleetsch[i] > counterfleet[i]) //kalo kecepetan
+                        {
+                            label14.Text = "Status : Fleet 1 KELAMBATAN";
 
-                        if (perbedaan > 310) speedcomm[i] = 80;
-                        else if (perbedaan <= 310) speedcomm[i] = 60;
+                            int perbedaan = counterfleetsch[i] - counterfleet[i];// menghitung perbedaan posisi fleet dan posisi scheduling fleet dalam satuan array
+                            label19.Text = "perbedaan = " + perbedaan; // menampilkan perbedaan posisi fleet dan posisi scheduling fleet dalam satuan array
 
-                        double ETA = (perbedaan * 3) / (20 * 1000 / 3600);
-                        label13.Text = "Speedcomm : " + speedcomm[i];
+                            //menentukan kecepatan baru fleet untuk mengejar ketertinggalan dari jadwal sesuai dengan besar perbedaan & menghitung ETA
+                            if (perbedaan <= perbedaan_segment)
+                            {
+                                kecepatanfleet[i] = kecepatan_kenceng1; // kecepatan fleet i = 64.8km/jam apabila perbedaan <= 30 step array
+                                double ETA = ((perbedaan * 3) / ((kecepatanfleet[i] * 1000 / 3600) - (kecepatan_normal * 1000 / 3600)));//menghitung estimasi waktu fleet untuk kembali pada jadwal seharusnya dengan kecepatan_kenceng1
+                                label18.Text = "ETA : " + ETA; //tampilkan ETA                            
+                            }
+                            else
+                            {
+                                kecepatanfleet[i] = kecepatan_kenceng2; // kecepatan fleet i = 86.4km/jam apabila perbedaan > 30 step array
+                                double ETA = (((perbedaan - 30 + (perbedaan % 3)) * 3) / ((kecepatanfleet[i] * 1000 / 3600) - (kecepatan_normal * 1000 / 3600))) + 30 + (perbedaan % 3);//menghitung estimasi waktu fleet untuk kembali pada jadwal seharusnya dengan kecepatan_keceng2
+                                label18.Text = "ETA : " + ETA; //tampilkan ETA
+                            }
+                            label13.Text = "Speedcomm : " + kecepatanfleet[i];
+                        }
+                        else if (counterfleetsch[i] < counterfleet[i]) //kalo kelambatan
+                        {
+                            label14.Text = "Status : Fleet 1 KECEPETAN";
+
+                            int perbedaan = counterfleet[i] - counterfleetsch[i]; // menghitung perbedaan posisi fleet dan posisi scheduling fleet dalam satuan array
+                            label19.Text = "perbedaan = " + perbedaan; // menampilkan perbedaan posisi fleet dan posisi scheduling fleet dalam satuan array
+
+                            //menentukan kecepatan baru fleet untuk mengejar ketertinggalan dari jadwal sesuai dengan besar perbedaan & menghitung ETA
+                            if (perbedaan <= perbedaan_segment)
+                            {
+                                kecepatanfleet[i] = kecepatan_lambat1; // kecepatan fleet i = 43.2km/jam apabila perbedaan <= 30 step array
+                                double ETA = ((perbedaan * 3) / (-(kecepatanfleet[i] * 1000 / 3600) + (kecepatan_normal * 1000 / 3600)));//menghitung estimasi waktu fleet untuk kembali pada jadwal seharusnya dengan kecepatan_lambat1
+                                label18.Text = "ETA : " + ETA; //tampilkan ETA                            
+                            }
+                            else
+                            {
+                                kecepatanfleet[i] = kecepatan_lambat2; // kecepatan fleet i = 21.6km/jam apabila perbedaan > 30 step array
+                                double ETA = (((perbedaan - 30 + (perbedaan % 3)) * 3) / (-(kecepatanfleet[i] * 1000 / 3600) + (kecepatan_normal * 1000 / 3600))) + 30 + (perbedaan % 3);//menghitung estimasi waktu fleet untuk kembali pada jadwal seharusnya dengan kecepatan_lambat2
+                                label18.Text = "ETA : " + ETA; //tampilkan ETA
+                            }
+                            label13.Text = "Speedcomm : " + kecepatanfleet[i];
+                        }
                     }
-                    else if (counterfleetsch[i] < counterfleet[i])
+                    else //sesuai dengan sch
                     {
-                        label14.Text = "Status : Fleet 1 KECEPETAN";
-                        int perbedaan = counterfleet[i] - counterfleetsch[i];
+                        int perbedaan = counterfleetsch[i] - counterfleet[i]; //ngecek aja bisi salah, selalu 0 harusnya
+                        label19.Text = "perbedaan = " + perbedaan;
 
-                        if (perbedaan > 310) speedcomm[i] = 20;
-                        else if (perbedaan <= 310) speedcomm[i] = 40;
+                        kecepatanfleet[i] = kecepatan_normal; //kecepatan = 54km/jam
+                        label14.Text = "Status : Fleet 1 PAS";
+                        label18.Text = "ETA : 0";
+                        label13.Text = "Speedcomm : " + kecepatanfleet[i];
 
-                        double ETA = (perbedaan * 3) / (20 * 1000 / 3600);
-                        label13.Text = "Speedcomm : " + speedcomm[i];
                     }
                 }
-                else
+                else //fleet lagi berhenti di halte
                 {
-                    speedcomm[i] = 50;
-                    label13.Text = "Speedcomm : " + speedcomm[i];
-                    int perbedaan = counterfleetsch[i] - counterfleet[i];
+                    kecepatanfleet[i] = 0; //kalo berhenti dihalte
                 }
             }
-
         }
+
+        //-------------------Algoritma penjadwalan-------------------
 
         public int sorting(double lat, double lon)
         {
