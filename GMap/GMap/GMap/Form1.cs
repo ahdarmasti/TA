@@ -35,16 +35,16 @@ namespace GMap
 
         //-------------------Algoritma penjadwalan-------------------
         Timer T1, T2, T3, T4, T5, T6, T7, T8, T9, T10;
-        Timer utama;
+        Timer utama, schedulling;
 
         public int[] counterfleet = new int[10] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-        public int[] counterfleetsch = new int[10] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        public int[] counterfleetsch = new int[10] { 50, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         public double[] speedcomm = new double[10];
 
         public int[] arrayke = new int[10] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] kecepatanfleet = new double[10] { 54, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         Boolean[] berhentihalte = new Boolean[10] { false, false, false, false, false, false, false, false, false, false };
-        int[] posisihalte = new int[10] { 40, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
+        int[] posisihalte = new int[10] { 41, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
         int[] durasiberhentifleet = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
         //inputan
@@ -54,7 +54,7 @@ namespace GMap
         double kecepatan_kenceng1 = 64.8; //km/jam
         double kecepatan_kenceng2 = 86.4; //km/jam
         int perbedaan_segment = 33; // 33*3 = 99 m
-        int durasi_berhenti = 10; //30 detik lama waktu berhenti di halte
+        int durasi_berhenti = 30; //30 detik lama waktu berhenti di halte
 
         //-------------------Algoritma penjadwalan-------------------
 
@@ -6283,6 +6283,11 @@ namespace GMap
             utama.Tick += new EventHandler(utama_tick);
             utama.Start();
 
+            //Timer schedulling
+            T10 = new Timer() { Interval = 200 };//kecepatan 54km/jam -->  1 kotak per 200ms
+            T10.Tick += new EventHandler(itung_tick);
+            T10.Start();
+
             //Timer fleet1
             T1 = new Timer() { Interval = 1000 };
             T1.Tick += new EventHandler(commandfleet1);
@@ -6484,9 +6489,12 @@ namespace GMap
                 else if (i == 9) { displayfleet10(coord[arrayke[i], 0], coord[arrayke[i], 1]); }
             }
             fleet1();
+            cekjadwal();  
+        }
+
+        void itung_tick(object sender, EventArgs e)
+        {
             penjadwalan();
-            cekjadwal();
-           
         }
 
         #region Fleetcommand
@@ -6823,7 +6831,7 @@ namespace GMap
 
                 if (berhentihalte[i] == false) //kalo lagi ga berhenti halte, countefleetsch[i] di tambah
                 {
-                    counterfleetsch[i] = counterfleetsch[i] + 5; //kecepatan fleet 54km/jam
+                    counterfleetsch[i] = counterfleetsch[i] + 1; //kecepatan fleet 54km/jam
                 }
                 else //kalo berhenti dihalte
                 {
@@ -6833,7 +6841,7 @@ namespace GMap
                     {
                         berhentihalte[i] = false; //kalo udah 30 detik ubah array indikator berhenti dihalte jd false 
                         durasiberhentifleet[i] = 0; //durasi jadi 0 lagi
-                        counterfleetsch[i] = counterfleetsch[i] + 5; //counterfleetsch nambah sesuai kecepatan fleet 54km/jam
+                        counterfleetsch[i] = counterfleetsch[i] + 1; //counterfleetsch nambah sesuai kecepatan fleet 54km/jam
                     }
                 }
                 label21.Text = "posisi sch :" + counterfleetsch[i];//update tulisan
