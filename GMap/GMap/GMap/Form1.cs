@@ -19,12 +19,15 @@ using GMap.NET.MapProviders;
 using uPLibrary.Networking.M2Mqtt;
 using uPLibrary.Networking.M2Mqtt.Messages;
 
+using System.IO;
+using System.Security.Cryptography;
+
 namespace GMap
 {
     public partial class Form1 : Form
     {
         string clientId = Guid.NewGuid().ToString(); //Client ID
-        MqttClient clientSub = new MqttClient("iot.eclipse.org"); // Buat subscribe 
+        MqttClient clientSub = new MqttClient("broker.hivemq.com"); // Buat subscribe 
 
         public double[] lat = new double[10];
         public double[] lon = new double[10];
@@ -32,11 +35,13 @@ namespace GMap
         public double[] batt = new double[10];
 
         GMapMarker currentMarker;
+        GMapOverlay[] markerold = new GMapOverlay[] 
 
         //-------------------Algoritma penjadwalan-------------------
         Timer T1, T2, T3, T4, T5, T6, T7, T8, T9, T10;
         Timer utama, schedulling;
 
+        //array
         public int[] counterfleet = new int[10] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         public int[] counterfleetsch = new int[10] { 50, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         public double[] speedcomm = new double[10];
@@ -44,10 +49,10 @@ namespace GMap
         public int[] arrayke = new int[10] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         double[] kecepatanfleet = new double[10] { 54, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         Boolean[] berhentihalte = new Boolean[10] { false, false, false, false, false, false, false, false, false, false };
-        int[] posisihalte = new int[10] { 41, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
         int[] durasiberhentifleet = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
         //inputan
+        int[] posisihalte = new int[10] { 41, 200, 300, 400, 500, 600, 700, 800, 900, 1000 };
         double kecepatan_lambat2 = 21.6; //km/jam
         double kecepatan_lambat1 = 43.2; //km/jam
         double kecepatan_normal = 54; //km/jam
@@ -56,6 +61,11 @@ namespace GMap
         int perbedaan_segment = 33; // 33*3 = 99 m
         int durasi_berhenti = 30; //30 detik lama waktu berhenti di halte
 
+
+        //crypt
+        bool RO = false;
+        Aes myAes;
+        byte[] coba = new byte[32];
         //-------------------Algoritma penjadwalan-------------------
 
         double[,] coord = new double[6199, 2]
@@ -6269,6 +6279,7 @@ namespace GMap
             clientSub.Connect(clientId);
             clientSub.MqttMsgPublishReceived += client_MqttMsgPublishReceived;
             gmap.OnMarkerClick += new MarkerClick(gmap_OnMarkerClick);
+            
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -6350,6 +6361,7 @@ namespace GMap
             MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE ,
             MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE, MqttMsgBase.QOS_LEVEL_AT_LEAST_ONCE ,});
             MessageBox.Show("Subscribe jalan");
+           
         }
 
         //---- NERIMA HASIL PUBLISHAN ----
@@ -6360,13 +6372,35 @@ namespace GMap
             if (e.Topic == "fleet1")
             {
                 string datafleet1 = Encoding.UTF8.GetString(e.Message);
+               // Console.WriteLine("data masuk        :{0}", datafleet1);
+                Console.WriteLine("besar data        :{0}", datafleet1.Length);
+                Console.WriteLine("data masuk!!!!!!!!!!!!!1");
+
+                //label3.Text =  datafleet1;
+                //string something = Encoding.ASCII.GetString(e.Message);
+                if (e.Message.Length >= 32)
+                {
+                    coba = e.Message; 
+                    cobacoba();
+                }
+                else
+                {
+                    Console.WriteLine("ga 32 coooy");
+                }
+                
+               
+                
+                
+                
+                /*
                 string[] data = datafleet1.Split(',');
                 //label14.Text = "Status : Data fleet1 masuk";
                 lat[0] = double.Parse(data[0], CultureInfo.InvariantCulture);
                 lon[0] = double.Parse(data[1], CultureInfo.InvariantCulture);
                 speed[0] = double.Parse(data[2], CultureInfo.InvariantCulture);
                 batt[0] = double.Parse(data[3], CultureInfo.InvariantCulture);
-            }
+                */
+             }
 
             else if (e.Topic == "fleet2")
             {
@@ -6472,7 +6506,10 @@ namespace GMap
 
         void utama_tick(object sender, EventArgs e)
         {
-            gmap.Overlays.Clear();
+
+            gmap.Overlays.Clear(); 
+            //markersOverlay.Markers.Remove(currentMarker)
+            //markers.Markers.Remove(marker);
             int i = 0;
             for (i = 0; i < 10; i++)
             {
@@ -6488,8 +6525,12 @@ namespace GMap
                 else if (i == 8) { displayfleet9(coord[arrayke[i], 0], coord[arrayke[i], 1]); }
                 else if (i == 9) { displayfleet10(coord[arrayke[i], 0], coord[arrayke[i], 1]); }
             }
+            
             fleet1();
-            cekjadwal();  
+            cekjadwal();
+           
+            
+           // cobacoba();
         }
 
         void itung_tick(object sender, EventArgs e)
@@ -6563,6 +6604,7 @@ namespace GMap
         #region Displayfleet
         void displayfleet1(double lat, double lon)
         {
+            gambarjadwal();
             Bitmap busmarker = GMap.Properties.Resources.BusMarker;
             GMapOverlay markers = new GMap.NET.WindowsForms.GMapOverlay("markers");
             GMapMarker marker = new GMarkerGoogle(
@@ -6581,6 +6623,15 @@ namespace GMap
             marker.ToolTip.TextPadding = new Size(2, 2);
             marker.ToolTipMode = MarkerTooltipMode.OnMouseOver;
             marker.Tag = 1;
+
+            if (marker != null)
+            {
+                
+                markers = null;
+            }
+
+
+
         }
 
         void displayfleet2(double lat, double lon)
@@ -6818,6 +6869,22 @@ namespace GMap
             arrayke[0] += kecepatanToCounter(kecepatanfleet[0]);
         }
 
+
+        void gambarjadwal()
+        {
+            
+            GMapOverlay routes = new GMapOverlay("routes");
+            List<PointLatLng> points = new List<PointLatLng>();
+            points.Add(new PointLatLng(-6.917596, 107.574737));
+            points.Add(new PointLatLng(-6.917703, 107.575675));
+            points.Add(new PointLatLng(-6.918482, 107.575611));
+            GMapRoute route = new GMapRoute(points, "A walk in the park");
+            route.Stroke = new Pen(Color.Red, 3);
+            routes.Routes.Add(route);
+            gmap.Overlays.Add(routes);
+
+        }
+
         void penjadwalan()
         {
             for (int i = 0; i <= 0; i++)
@@ -6927,6 +6994,149 @@ namespace GMap
         }
 
         //-------------------Algoritma penjadwalan-------------------
+        //---------------------------AES-----------------------------
+        void cobacoba()
+        {
+            //string original = "1111";
+            
+            
+
+           // using (Aes myAes = Aes.Create())
+           // {
+                
+                if (!RO)
+                {
+                    myAes = Aes.Create();
+                    RO = true;
+                }
+                
+
+                myAes.Key = new byte[] { 0x41, 0x41, 0x41, 0x41, 
+                                         0x41, 0x41, 0x41, 0x41,
+                                         0x41, 0x41, 0x41, 0x41,
+                                         0x41, 0x41, 0x41, 0x41, };
+
+                myAes.IV = new byte[]  { 0x41, 0x41, 0x41, 0x41, 
+                                         0x41, 0x41, 0x41, 0x41,
+                                         0x41, 0x41, 0x41, 0x41,
+                                         0x41, 0x41, 0x41, 0x41, };
+
+
+               // byte[] encrypted = EncryptStringToBytes_Aes(original, myAes.Key, myAes.IV);
+
+                //byte[] coba = new byte[] { 0x64, 0x12, 0x59, 0x98, 0x2B, 0xD4, 0x67, 0x9F, 0x4D, 0x7C, 0x4D, 0x7F, 0xC8, 0x74, 0xA8, 0x52, 0xBF, 0x50, 0xDE, 0x71, 0x21, 0x93, 0xD4, 0x07, 0xD1, 0xD0, 0x26, 0x9D, 0x25, 0x8B, 0xD1, 0x9B };
+
+               // Console.WriteLine("encryption:  {0}", BitConverter.ToString(encrypted).Replace("-", " ,0x"));
+                Console.WriteLine("IV        :  {0}", BitConverter.ToString(myAes.IV).Replace("-", " ,0x"));
+
+                string roundtrip = DecryptStringFromBytes_Aes(coba, myAes.Key, myAes.IV);
+
+
+               // Console.WriteLine("Original:   {0}", original);
+                Console.WriteLine("Round Trip: {0}", roundtrip);
+
+           // }
+        }
+
+        static byte[] EncryptStringToBytes_Aes(string plainText, byte[] Key, byte[] IV)
+        {
+            // Check arguments.
+            if (plainText == null || plainText.Length <= 0)
+                throw new ArgumentNullException("plainText");
+            if (Key == null || Key.Length <= 0)
+                throw new ArgumentNullException("Key");
+            if (IV == null || IV.Length <= 0)
+                throw new ArgumentNullException("IV");
+            byte[] encrypted;
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Key;
+                aesAlg.IV = IV;
+
+                // Create a decrytor to perform the stream transform.
+                ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+                // Create the streams used for encryption.
+                using (MemoryStream msEncrypt = new MemoryStream())
+                {
+                    using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    {
+                        using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                        {
+                            //Write all data to the stream.
+                            swEncrypt.Write(plainText);
+                        }
+                        encrypted = msEncrypt.ToArray();
+                    }
+                }
+            }
+
+            // Return the encrypted bytes from the memory stream.
+            return encrypted;
+
+        }
+
+
+        static string DecryptStringFromBytes_Aes(byte[] cipherText, byte[] Key, byte[] IV)
+        {
+            // Check arguments.
+            if (cipherText == null || cipherText.Length <= 0)
+                throw new ArgumentNullException("cipherText");
+            if (Key == null || Key.Length <= 0)
+                throw new ArgumentNullException("Key");
+            if (IV == null || IV.Length <= 0)
+                throw new ArgumentNullException("IV");
+
+            //Console.WriteLine("panjang data yang mau di enkrip bat  :{0}", cipherText.Length);
+
+         
+            byte[] a = new byte[32];
+
+            for (int i = 0; i < 32; i++) { a[i] = cipherText [i];}
+           // Console.WriteLine("panjang data yang mau di enkrip bat aaaaa  :{0}", a.Length);
+
+            //string result = System.Text.Encoding.UTF8.GetString(cipherText);
+
+
+
+            // Declare the string used to hold
+            // the decrypted text.
+            string plaintext = null;
+
+            // Create an Aes object
+            // with the specified key and IV.
+            using (Aes aesAlg = Aes.Create())
+            {
+                aesAlg.Key = Key;
+                aesAlg.IV = IV;
+                aesAlg.Padding = PaddingMode.None;
+
+                // Create a decrytor to perform the stream transform.
+                ICryptoTransform decryptor = aesAlg.CreateDecryptor(aesAlg.Key, aesAlg.IV);
+
+
+
+                // Create the streams used for decryption.
+                using (MemoryStream msDecrypt = new MemoryStream(a))
+                {
+                    using (CryptoStream csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                    {
+                        using (StreamReader srDecrypt = new StreamReader(csDecrypt))
+                        {
+
+                            // Read the decrypted bytes from the decrypting stream
+                            // and place them in a string.
+                            plaintext = srDecrypt.ReadToEnd();
+                        }
+                    }
+                }
+            }
+            return plaintext;
+        }
+
+        //---------------------------AES-----------------------------
 
         public int sorting(double lat, double lon)
         {
